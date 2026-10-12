@@ -2,7 +2,25 @@
 
 Status and one-click fastest-server connection for Proton VPN in the menu bar.
 
-![Proton VPN widget preview](preview.png)
+<p><img src="preview.png" alt="The Proton VPN panel while connected: protection state, server, tunnel IP, live rates and favorites" width="420"></p>
+
+## Screenshots
+
+**In the bar.** The shield is faded while disconnected and full strength once the tunnel is up.
+
+<p><img src="docs/screenshots/bar-icon-states.png" alt="The bar icon connected (top) and disconnected (bottom)" width="160"></p>
+
+**Connected.** Protection state, server, tunnel IP, live download and upload rates, and your favorites.
+
+<p><img src="docs/screenshots/panel-connected.png" alt="The panel while connected and protected" width="420"></p>
+
+**Disconnected.** Favorites, torrent tunnel status, a leak check, and the network section.
+
+<p><img src="docs/screenshots/panel-disconnected.png" alt="The panel while disconnected" width="420"></p>
+
+**Offline server map.** Press `m` to show every server location on a world map.
+
+<p><img src="docs/screenshots/panel-map.png" alt="The panel with the server map expanded" width="420"></p>
 
 ## Features
 
