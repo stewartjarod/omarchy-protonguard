@@ -4,7 +4,7 @@
 # Run by hand, or from `omarchy update` through the post-update hook
 # (~/.config/omarchy/hooks/post-update.d/protonvpn-sync).
 #
-# Our changes (feature work, then the jarod.protonvpn id rename) sit on top of
+# Our changes (feature work, then the stewartjarod.protonvpn id rename) sit on top of
 # upstream main. If upstream moved, we rebase them onto it. If the rebase
 # conflicts, we undo it and stop, so the branch is never left half-rebased.
 # Fix it by hand with:
@@ -14,7 +14,7 @@
 # never overwritten with upstream's main here.
 set -euo pipefail
 
-PLUGIN_DIR=${PROTONVPN_DIR:-$HOME/.config/omarchy/plugins/jarod.protonvpn}
+PLUGIN_DIR=${PROTONVPN_DIR:-$HOME/.config/omarchy/plugins/stewartjarod.protonvpn}
 BRANCH=jarod
 
 cd "$PLUGIN_DIR"
