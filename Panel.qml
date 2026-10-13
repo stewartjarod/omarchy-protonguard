@@ -21,6 +21,8 @@ Panel {
   // nested panel, so the popout coordinator compares against the host widget.
   property var hostWidget: null
   readonly property var barIdentity: hostWidget || root
+  // The search field only exists while the server list is expanded (see serverSearchLoader).
+  readonly property Item serverSearch: serverSearchLoader.item
 
   readonly property color foreground: bar ? bar.foreground : Color.foreground
   readonly property color urgent: bar ? bar.urgent : Color.urgent
@@ -451,7 +453,6 @@ Panel {
     cursorActive = false
     focusSection = "header"
     selectedIndex = 0
-    if (serverSearch && serverSearch.activeFocus) keyCatcher.forceActiveFocus()
     if (panelFlick) panelFlick.contentY = 0
   }
 
@@ -499,7 +500,12 @@ Panel {
     serversExpanded = !serversExpanded
   }
 
-  onServersExpandedChanged: clampSelection()
+  // The search field is destroyed when the list folds; hand the keys back so the panel never
+  // ends up with nothing focused.
+  onServersExpandedChanged: {
+    clampSelection()
+    if (!serversExpanded && opened) keyCatcher.forceActiveFocus()
+  }
 
   function clampSelection() {
     if (focusSection === "rows" && selectedIndex >= cursorRowCount)
@@ -561,7 +567,7 @@ Panel {
       id: keyCatcher
       anchors.fill: parent
       // Let the search field receive keys itself while it's focused.
-      blocked: serverSearch.activeFocus
+      blocked: !!root.serverSearch && root.serverSearch.activeFocus
       onMoveRequested: function(dx, dy) {
         if (dy !== 0) root.moveCursor(dy)
       }
@@ -791,33 +797,41 @@ Panel {
               }
             }
 
-            TextField {
-              id: serverSearch
-              visible: root.serversExpanded
+            // Created only while the list is expanded: a text input that always exists
+            // listens to every clipboard change inside the shell.
+            Loader {
+              id: serverSearchLoader
+              active: root.serversExpanded
+              visible: active
               width: parent.width
-              foreground: root.foreground
-              placeholderText: "Search countries, states, cities, servers  (/)"
-              text: root.searchQuery
-              onTextChanged: {
-                if (root.searchQuery === text) return
-                root.searchQuery = text
-                root.expandedCountry = ""
-                root.expandedCity = ""
-                root.selectFirstResult()
-              }
-              onAccepted: {
-                if (!(root.cursorActive && root.focusSection === "rows")) root.selectFirstResult()
-                root.activateCursor()
-              }
-              Keys.onPressed: function(event) {
-                if (event.key === Qt.Key_Down) { root.moveCursor(1); event.accepted = true; return }
-                if (event.key === Qt.Key_Up) { root.moveCursor(-1); event.accepted = true; return }
-                // Esc hands keys back to the list but keeps the query, so
-                // results can be walked with j/k, starred with b, opened
-                // with enter. A second Esc closes the panel as usual.
-                if (event.key === Qt.Key_Escape) {
-                  keyCatcher.forceActiveFocus()
-                  event.accepted = true
+              sourceComponent: Component {
+                TextField {
+                  width: parent.width
+                  foreground: root.foreground
+                  placeholderText: "Search countries, states, cities, servers  (/)"
+                  text: root.searchQuery
+                  onTextChanged: {
+                    if (root.searchQuery === text) return
+                    root.searchQuery = text
+                    root.expandedCountry = ""
+                    root.expandedCity = ""
+                    root.selectFirstResult()
+                  }
+                  onAccepted: {
+                    if (!(root.cursorActive && root.focusSection === "rows")) root.selectFirstResult()
+                    root.activateCursor()
+                  }
+                  Keys.onPressed: function(event) {
+                    if (event.key === Qt.Key_Down) { root.moveCursor(1); event.accepted = true; return }
+                    if (event.key === Qt.Key_Up) { root.moveCursor(-1); event.accepted = true; return }
+                    // Esc hands keys back to the list but keeps the query, so
+                    // results can be walked with j/k, starred with b, opened
+                    // with enter. A second Esc closes the panel as usual.
+                    if (event.key === Qt.Key_Escape) {
+                      keyCatcher.forceActiveFocus()
+                      event.accepted = true
+                    }
+                  }
                 }
               }
             }
