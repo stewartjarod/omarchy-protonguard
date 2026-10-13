@@ -71,7 +71,7 @@ Of ~5,400 recorded scans about half passed outright, and ~70% of the most popula
 - Manifest kind is `bar-widget` only. `BarWidget.qml` is instantiated **once per monitor** and owns a
   `Service.qml` (the data source: Proton CLI polling, protection state, torrent tunnel health). Shared
   poll results are published so the other monitor's Service shows the same state. `Panel.qml` is the
-  popup; `MapView.qml` the offline map; `VpnIcon.qml`/`ProtonIcon.qml` the icons.
+  popup; `MapView.qml` the offline map; `VpnIcon.qml` the bar and panel icon.
 - The `IpcHandler` in `BarWidget.qml` exists per monitor; the shell logs a harmless "another handler is
   registered" warning for the second one.
 - `*Model.js`: pure logic, no QML/IO, with `.pragma library` and a `module.exports` guard so

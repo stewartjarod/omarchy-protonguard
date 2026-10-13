@@ -45,8 +45,8 @@ Item {
       var ac = root.accent
 
       // Land
-      ctx.fillStyle = Qt.rgba(fg.r, fg.g, fg.b, 0.13)
-      ctx.strokeStyle = Qt.rgba(fg.r, fg.g, fg.b, 0.30)
+      ctx.fillStyle = Util.alpha(fg, 0.13)
+      ctx.strokeStyle = Util.alpha(fg, 0.30)
       ctx.lineWidth = 0.6
       var land = Land.LAND
       for (var i = 0; i < land.length; i++) {
@@ -64,7 +64,7 @@ Item {
       for (var k = 0; k < pts.length; k++) {
         var d = pts[k]
         var fav = root.favoriteCodes[d.code] === true
-        ctx.fillStyle = fav ? Qt.rgba(ac.r, ac.g, ac.b, 0.95) : Qt.rgba(fg.r, fg.g, fg.b, 0.55)
+        ctx.fillStyle = fav ? Util.alpha(ac, 0.95) : Util.alpha(fg, 0.55)
         ctx.beginPath()
         ctx.arc(root.px(d.lon), root.py(d.lat), fav ? 2.4 : 1.6, 0, Math.PI * 2)
         ctx.fill()
@@ -77,7 +77,7 @@ Item {
         if (root.arcFrom) {
           var x1 = root.px(root.arcFrom.lon), y1 = root.py(root.arcFrom.lat)
           var cx = (x1 + x2) / 2, cy = Math.min(y1, y2) - Math.abs(x2 - x1) * 0.25 - 4
-          ctx.strokeStyle = Qt.rgba(ac.r, ac.g, ac.b, 0.9)
+          ctx.strokeStyle = Util.alpha(ac, 0.9)
           ctx.lineWidth = 1.2
           var steps = 28
           for (var s = 0; s < steps; s += 2) {
@@ -87,18 +87,18 @@ Item {
             ctx.lineTo((1 - t1) * (1 - t1) * x1 + 2 * (1 - t1) * t1 * cx + t1 * t1 * x2, (1 - t1) * (1 - t1) * y1 + 2 * (1 - t1) * t1 * cy + t1 * t1 * y2)
             ctx.stroke()
           }
-          ctx.fillStyle = Qt.rgba(ac.r, ac.g, ac.b, 0.9)
+          ctx.fillStyle = Util.alpha(ac, 0.9)
           ctx.beginPath()
           ctx.arc(x1, y1, 2.2, 0, Math.PI * 2)
           ctx.fill()
         }
         // Connected server: ring + dot.
-        ctx.strokeStyle = Qt.rgba(ac.r, ac.g, ac.b, 0.55)
+        ctx.strokeStyle = Util.alpha(ac, 0.55)
         ctx.lineWidth = 1.2
         ctx.beginPath()
         ctx.arc(x2, y2, 6, 0, Math.PI * 2)
         ctx.stroke()
-        ctx.fillStyle = Qt.rgba(ac.r, ac.g, ac.b, 1)
+        ctx.fillStyle = Util.alpha(ac, 1)
         ctx.beginPath()
         ctx.arc(x2, y2, 3.2, 0, Math.PI * 2)
         ctx.fill()
