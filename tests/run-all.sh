@@ -42,7 +42,7 @@ if [ -n "$dups" ]; then echo "$dups"; status=1; else echo "none"; fi
 # popup closed. Create it from a Loader whose `active` is true only while it is needed, and add that
 # file to ALLOW below (one file name per entry, space separated).
 echo "== text inputs only where allowed"
-ALLOW=""
+ALLOW="Panel.qml"   # the server search field: created from a Loader that is active only while the list is open
 inputs=$(grep -n -E '^[[:space:]]*(TextField|TextInput|TextArea)[[:space:]]*\{' $(find . -name '*.qml' -not -path './.git/*' -not -path './tests/*' -not -path './.omarchy-ref/*') 2>/dev/null || true)
 for a in $ALLOW; do inputs=$(printf '%s\n' "$inputs" | grep -v "/$a:" || true); done
 if [ -n "$(printf '%s' "$inputs" | tr -d '[:space:]')" ]; then echo "$inputs"; status=1; else echo "none"; fi

@@ -123,6 +123,7 @@ before using the bar toggle with this backend.
 
 ## Requirements
 
+- Omarchy 4.0.4 or newer (the version this is developed and tested on)
 - `proton-vpn-cli` installed and signed in
 - `wl-copy` for copy actions
 - `notify-send` for desktop notifications (disable with the
