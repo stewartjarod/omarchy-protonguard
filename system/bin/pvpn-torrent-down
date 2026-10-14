@@ -7,6 +7,7 @@ set -euo pipefail
 . /usr/local/lib/pvpn-torrent/common.sh
 ip -n "$NS" link del "$WG_IF" 2>/dev/null || true
 ip link del "$WG_IF" 2>/dev/null || true
+drop_endpoint_route
 rm -f "$RUN_DIR/status" "$RUN_DIR/port"
 if [[ "${1:-}" == "--purge" ]]; then
   ip netns del "$NS" 2>/dev/null || true

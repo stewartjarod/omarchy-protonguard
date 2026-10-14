@@ -124,6 +124,7 @@ while true; do
     sleep 5
     continue
   fi
+  sync_endpoint_route
   sync_fwmark
   (( cycle % 3 == 0 )) && renew_port
   lookup_exit_ip

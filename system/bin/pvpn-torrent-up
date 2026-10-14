@@ -75,6 +75,11 @@ table inet pvpntorguard {
 NFT
 
 # --- WireGuard ---------------------------------------------------------------
+# The encrypted socket lives in the root namespace: make sure its endpoint is
+# routed via the real uplink, not a desktop killswitch (pvpn-torrent-portfwd
+# keeps re-asserting this while the tunnel runs).
+sync_endpoint_route
+
 # Create the interface in the root namespace (so its encrypted socket can reach
 # the internet), configure it, then move it in. The socket stays in the root
 # namespace; the plaintext side lives only in $NS.

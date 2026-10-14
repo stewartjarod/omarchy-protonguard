@@ -44,3 +44,61 @@ wg_server_tag() {
 ns_exists() {
   [[ -e "/run/netns/$NS" ]]
 }
+
+# --- keep the tunnel's own packets off the killswitch ------------------------
+# The tunnel's encrypted socket lives in the root namespace. With a desktop
+# killswitch up, `main` has a default route into a dummy interface that beats
+# the real gateway, and only the desktop VPN's endpoint is excepted. Without a
+# host route of its own, the torrent tunnel's endpoint is swallowed by it.
+
+# physical_uplink: "<gateway> <dev>" of the lowest-metric default route in
+# `main` that leaves through a real NIC (not dummy, wireguard, tun, ...).
+physical_uplink() {
+  local metric gw dev
+  while read -r metric gw dev; do
+    [[ -e "/sys/class/net/$dev/device" ]] || continue   # virtual devices have no backing device
+    echo "$gw $dev"; return 0
+  done < <(ip -4 route show default table main | awk '
+    { m = 0; gw = ""; dev = ""
+      for (i = 1; i < NF; i++) {
+        if ($i == "metric") m = $(i + 1)
+        if ($i == "via")    gw = $(i + 1)
+        if ($i == "dev")    dev = $(i + 1)
+      }
+      if (gw != "" && dev != "") print m, gw, dev }' | sort -n)
+  return 1
+}
+
+# sync_endpoint_route: make sure the endpoint in $WG_CONF is reachable through
+# the real uplink, and record the route we installed so down can remove it.
+# Idempotent; safe to call every few seconds. Never fails the caller.
+sync_endpoint_route() {
+  local endpoint ep spec uplink gw dev
+  endpoint=$(wg_get "$WG_CONF" peer Endpoint 2>/dev/null)
+  ep=${endpoint%:*}
+  [[ "$ep" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]] || return 0   # IPv4 literals only
+  uplink=$(physical_uplink) || return 0
+  read -r gw dev <<< "$uplink"
+  spec="$ep/32 via $gw dev $dev"
+  [[ "$(cat "$RUN_DIR/endpoint-route" 2>/dev/null)" == "$spec" ]] \
+    && ip route show "$ep/32" 2>/dev/null | grep -q . && return 0
+  # A different endpoint than last time: drop the old route first.
+  drop_endpoint_route
+  # Leave a route something else (the desktop VPN) already put there alone.
+  ip route show exact "$ep/32" table main 2>/dev/null | grep -q . && return 0
+  # shellcheck disable=SC2086
+  if ip route replace $spec metric 100 2>/dev/null; then
+    install -d -m 755 "$RUN_DIR"
+    printf '%s\n' "$spec" > "$RUN_DIR/endpoint-route"
+    echo "[pvpn-torrent] endpoint route: $spec"
+  fi
+  return 0
+}
+
+drop_endpoint_route() {
+  local spec
+  spec=$(cat "$RUN_DIR/endpoint-route" 2>/dev/null) || return 0
+  # shellcheck disable=SC2086
+  ip route del $spec 2>/dev/null || true
+  rm -f "$RUN_DIR/endpoint-route"
+}
