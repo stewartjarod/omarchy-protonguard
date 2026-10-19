@@ -32,6 +32,9 @@ Item {
   property string connectedUptime: ""
   property var connectedSince: 0
   property string actionStatus: ""
+  // A bar right-click while connected arms this; a second one within the
+  // confirm window disconnects. See requestToggle.
+  property bool disconnectArmed: false
   property string lastError: ""
   property var freeCountries: []
   property var serverRows: ({})
@@ -503,6 +506,7 @@ Item {
       if (!prevConnected && _stateKnown) connectedSince = Date.now()
     } else {
       connectedSince = 0
+      cancelDisconnectConfirm()
     }
     connectedUptime = connected ? formatUptime() : ""
     _lastConnected = connected
@@ -546,6 +550,28 @@ Item {
     if (toggling) return
     if (connected) disconnect()
     else connect()
+  }
+
+  // Bar right-click: connecting is immediate, but disconnecting needs a second
+  // right-click within 2.5s so a stray click doesn't drop the VPN.
+  function requestToggle() {
+    if (toggling) return
+    if (!connected) { connect(); return }
+    if (disconnectArmed) {
+      cancelDisconnectConfirm()
+      disconnect()
+      return
+    }
+    disconnectArmed = true
+    disconnectConfirmTimer.restart()
+    actionStatus = "Right-click again to disconnect"
+    actionStatusTimer.restart()
+    notify("Disconnect Proton VPN?", "Right-click again to confirm", false)
+  }
+
+  function cancelDisconnectConfirm() {
+    disconnectArmed = false
+    disconnectConfirmTimer.stop()
   }
 
   function connect() {
@@ -745,6 +771,13 @@ Item {
     interval: 2600
     repeat: false
     onTriggered: root.actionStatus = ""
+  }
+
+  Timer {
+    id: disconnectConfirmTimer
+    interval: 2500
+    repeat: false
+    onTriggered: root.cancelDisconnectConfirm()
   }
 
   Timer {

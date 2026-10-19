@@ -54,7 +54,8 @@ Status and one-click fastest-server connection for Proton VPN in the menu bar.
   (goes through the shell's notification daemon, so do-not-disturb applies).
 - Left click opens the panel. The panel's on/off switch responds to the click
   instantly (optimistically) and reconciles with the real VPN state.
-- Right click connects to the fastest eligible Proton server or disconnects.
+- Right click connects to the fastest eligible Proton server. While connected,
+  right click asks first: right-click again within 2.5s to disconnect.
 - Middle click refreshes status.
 - Keyboard navigation: `j`/`k`, `enter`, `t`, `c`, `s`, `f`, `b`, `/`, `g` (settings), `m` (map), `r`, and `esc`.
 
