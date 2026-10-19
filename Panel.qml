@@ -628,7 +628,7 @@ Panel {
                   connecting: root.service ? root.service.connectingAny : false
                   torrentState: root.service ? root.service.torrentState : "off"
                   badgeColor: root.urgent
-                  warning: root.hasError || (root.service && (root.service.protection === "leaking" || root.service.protection === "stale" || root.service.protection === "blocked"))
+                  warning: root.service ? root.service.torrentState === "error" : false
                 }
               }
               trailingControl: Component {

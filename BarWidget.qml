@@ -20,9 +20,9 @@ BarWidget {
 
   readonly property bool vpnConnected: vpn.connected
   readonly property bool vpnBusy: vpn.busy
-  // An error, or the tunnel is up but not protecting (leaking / stale), or
-  // the kill switch is blocking traffic.
-  readonly property bool vpnWarning: vpn.lastError !== "" || vpn.protection === "leaking" || vpn.protection === "stale" || vpn.protection === "blocked"
+  // Red badge only for the torrent tunnel (broken or leaking). Desktop VPN
+  // states (off, kill switch, stale) stay neutral; the panel spells them out.
+  readonly property bool vpnWarning: vpn.torrentState === "error"
 
   // ---- Panel lifecycle, forwarded for shell.summon/hide/toggle routing.
   //      Bar.findPanelWidget requires open/close/opened on the bar-widget root.
