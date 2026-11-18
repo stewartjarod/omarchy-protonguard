@@ -233,20 +233,13 @@ To change server, re-run step 3 with another config. To remove:
 
 | Key                  | Type    | Default | Meaning                        |
 |----------------------|---------|---------|--------------------------------|
-| `refreshIntervalSec` | integer | 60      | Status poll interval while connected |
+| `refreshIntervalSec` | integer | 30      | CLI status poll interval       |
 | `notificationsEnabled` | boolean | true  | Desktop notifications on connect/disconnect/failure |
-
-Polling only runs while connected, where `refreshIntervalSec` keeps live
-rates, uptime, and connection drops fresh. While disconnected the timer stops
-completely, so no `protonvpn status` process is spawned and the Proton daemon
-is not woken. A NetworkManager watcher triggers a status check only when a
-network event could mean a WireGuard tunnel came up; manual refresh still
-works from the panel and middle click.
 
 Set it with:
 
 ```bash
-omarchy bar set tharin.protonvpn refreshIntervalSec 60
+omarchy bar set tharin.protonvpn refreshIntervalSec 30
 ```
 
 ## Removal
